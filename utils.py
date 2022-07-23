@@ -54,9 +54,8 @@ def calc_cross_sectional_area(h, d):
     # promień
     radius = d / 2
 
-    # wysokość pustki nad ściekami
+    # cięciwa
     cięciwa = math.sqrt((radius ** 2 - ((h-radius) ** 2))) * 2
-    print(f"cięciwa: {cięciwa}")
 
     # calculate angle - kąt obliczany z reguły cosinusów
     alpha = math.acos((radius ** 2 + radius ** 2 - cięciwa ** 2) / (2 * radius ** 2))
@@ -67,7 +66,24 @@ def calc_cross_sectional_area(h, d):
 
     # Secor of area
     area = 1 / 2 * (alpha - math.sin(alpha)) * radius ** 2
+    print(f"area: {area}")
+
+    print(f"procent: {((circle_area - area) / circle_area) * 100}")
     return area
 
 
-print(calc_cross_sectional_area(9.307, 12))
+def calc_filling_percentage(h, d):
+    sector_area = calc_cross_sectional_area(h, d)
+    circle_area = (math.pi * d ** 2) / 4
+    return ((circle_area - sector_area) / circle_area) * 100
+
+def calc_u():
+    pass
+
+def calc_rh(f, u):
+    pass
+
+
+# print(calc_cross_sectional_area(9.307, 12))
+print(calc_filling_percentage(9.307, 12))
+
