@@ -59,23 +59,20 @@ def calc_cross_sectional_area(h, d):
 
     # calculate angle - kąt obliczany z reguły cosinusów
     alpha = math.acos((radius ** 2 + radius ** 2 - cięciwa ** 2) / (2 * radius ** 2))
-    print(f"alpha: {alpha}")
 
-    circle_area = math.pi * radius ** 2
-    print(f"circle_area: {circle_area}")
-
-    # Secor of area
-    area = 1 / 2 * (alpha - math.sin(alpha)) * radius ** 2
-    print(f"area: {area}")
-
-    print(f"procent: {((circle_area - area) / circle_area) * 100}")
-    return area
+    # jeśli h większe niż promień obliczam napełnienie ponad 50%
+    if h > radius:
+        return math.pi * radius ** 2 - (1 / 2 * (alpha - math.sin(alpha)) * radius ** 2)
+    # napełnienie dokładnie 50%
+    elif h == radius:
+        return math.pi * radius ** 2 / 2
+    # napełnienie poniżej 50%
+    else:
+        return 1 / 2 * (alpha - math.sin(alpha)) * radius ** 2
 
 
 def calc_filling_percentage(h, d):
-    sector_area = calc_cross_sectional_area(h, d)
-    circle_area = (math.pi * d ** 2) / 4
-    return ((circle_area - sector_area) / circle_area) * 100
+    return calc_cross_sectional_area(h, d) / (math.pi * (d / 2) ** 2) * 100
 
 def calc_u():
     pass
@@ -84,6 +81,8 @@ def calc_rh(f, u):
     pass
 
 
-# print(calc_cross_sectional_area(9.307, 12))
+print(calc_cross_sectional_area(9.307, 12))
 print(calc_filling_percentage(9.307, 12))
+print(calc_filling_percentage(6, 12))
+print(calc_filling_percentage(3, 12))
 
