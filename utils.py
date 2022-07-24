@@ -74,15 +74,35 @@ def calc_cross_sectional_area(h, d):
 def calc_filling_percentage(h, d):
     return calc_cross_sectional_area(h, d) / (math.pi * (d / 2) ** 2) * 100
 
-def calc_u():
-    pass
+def calc_u(h, d):
+    # promień
+    radius = d / 2
+
+    # cięciwa
+    cięciwa = math.sqrt((radius ** 2 - ((h-radius) ** 2))) * 2
+
+    # calculate angle - kąt obliczany z reguły cosinusów
+    alpha = math.acos((radius ** 2 + radius ** 2 - cięciwa ** 2) / (2 * radius ** 2))
+    print(f"alpha: {alpha}")
+    print(f"kąt: {math.degrees(alpha)}")
+
+    print(f"obwód koła {2 * math.pi * radius}")
+
+    print(f"example: {(math.cos(math.radians(1)) * 180) / math.pi}")
+
+    # return (angle / 360) * 2 * math.pi * radius
 
 def calc_rh(f, u):
     pass
 
 
-print(calc_cross_sectional_area(9.307, 12))
-print(calc_filling_percentage(9.307, 12))
-print(calc_filling_percentage(6, 12))
-print(calc_filling_percentage(3, 12))
+# print(math.cos(math.radians(60)))
+# print(math.degrees(math.atan2(7, 9.899)))
 
+# a = 4
+# c = 9.899
+# b = math.sqrt(c ** 2 - a ** 2)
+# z praw cosinusów
+# print(math.degrees(math.acos((a * a + b * b - c * c) / (2 * a * b))))
+# print(math.degrees(math.acosm         (())))
+print(calc_u(11.99, 12))
