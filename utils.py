@@ -1,5 +1,9 @@
+import logging
 import math
 import numpy as np
+
+
+logger = logging.getLogger(__name__)
 
 
 class PipeSettings:
@@ -23,6 +27,12 @@ class Pipe:
         ]
 
 
+def validate_filling(h, d):
+    if h > d:
+        return False
+    return True
+
+
 def calc_cross_sectional_area(h, d):
     """
     This function calculates the cross-sectional area of a cylinder given its height and diameter
@@ -30,21 +40,24 @@ def calc_cross_sectional_area(h, d):
     :param h: napełnienie [m]
     :param d: diameter of the pipe [m]
     """
-    # promień
-    radius = d / 2
+    if validate_filling(h, d):
+        # promień
+        radius = d / 2
 
-    # cięciwa
-    chord = math.sqrt((radius ** 2 - ((h-radius) ** 2))) * 2
+        # cięciwa
+        chord = math.sqrt((radius ** 2 - ((h-radius) ** 2))) * 2
 
-    # calculate angle - kąt obliczany z reguły cosinusów
-    alpha = math.acos((radius ** 2 + radius ** 2 - chord ** 2) / (2 * radius ** 2))
+        # calculate angle - kąt obliczany z reguły cosinusów
+        alpha = math.acos((radius ** 2 + radius ** 2 - chord ** 2) / (2 * radius ** 2))
 
-    if h > radius:
-        return math.pi * radius ** 2 - (1 / 2 * (alpha - math.sin(alpha)) * radius ** 2)
-    elif h == radius:
-        return math.pi * radius ** 2 / 2
+        if h > radius:
+            return math.pi * radius ** 2 - (1 / 2 * (alpha - math.sin(alpha)) * radius ** 2)
+        elif h == radius:
+            return math.pi * radius ** 2 / 2
+        else:
+            return 1 / 2 * (alpha - math.sin(alpha)) * radius ** 2
     else:
-        return 1 / 2 * (alpha - math.sin(alpha)) * radius ** 2
+        logger.info(f"h cannot be greater than d.")
 
 
 def calc_filling_percentage(h, d):
@@ -52,15 +65,20 @@ def calc_filling_percentage(h, d):
 
 
 def calc_u(h, d):
-    radius = d / 2
-    # cięciwa
-    chord = math.sqrt((radius ** 2 - (h-radius) ** 2)) * 2
-    angle = math.degrees(math.acos((radius ** 2 + radius ** 2 - chord ** 2) / (2 * radius ** 2)))
-    return angle / 360 * 2 * math.pi * radius
+    if validate_filling(h, d):
+        radius = d / 2
+        # cięciwa
+        chord = math.sqrt((radius ** 2 - (h-radius) ** 2)) * 2
+        angle = math.degrees(math.acos((radius ** 2 + radius ** 2 - chord ** 2) / (2 * radius ** 2)))
+        return angle / 360 * 2 * math.pi * radius
+    return None
 
 
 def calc_rh(f, u):
-    return f / u
+    try:
+        return f / u
+    except ZeroDivisionError:
+        return 0
 
 
 def calc_velocity(h, d, i):
@@ -72,9 +90,11 @@ def calc_velocity(h, d, i):
     :param i: decrease of the wastewater table, equal to the slope of the bottom of the sewer when the liquid flows with a free mirror, or the decrease of the pressure line when the sewer works under pressure,
     :return: The velocity of the wave.
     """
-    f = calc_cross_sectional_area(h, d)
-    u = calc_u(h, d)
-    return (1 / 0.013) * (calc_rh(f, u) ** (2/3)) * i ** (1/2)
+    if validate_filling(h, d):
+        f = calc_cross_sectional_area(h, d)
+        u = calc_u(h, d)
+        return (1 / 0.013) * (calc_rh(f, u) ** (2/3)) * i ** (1/2)
+    return None
 
 
 def calc_flow(h, d, i):
@@ -85,9 +105,11 @@ def calc_flow(h, d, i):
     :param v: the velocity of the fluid
     :return: The product of f and v
     """
-    f = calc_cross_sectional_area(h, d)
-    v = calc_velocity(h, d, i)
-    return f * v
+    if validate_filling(h, d):
+        f = calc_cross_sectional_area(h, d)
+        v = calc_velocity(h, d, i)
+        return f * v
+    return None
 
 # mam podany przepływ i spadek, chcę sprawdzić czy dobrano poprawnie średnicę
 # ma zwrócić minimalną średnicę
@@ -99,6 +121,21 @@ def validate_diameter(q, d, i):
     # 1 sprawdzić napełnienie kanału. - obliczyć h na podstawie przepływu średnicy i spadku
     # 1 oblicz prędkość wody
     v = calc_velocity()
+
+
+def find_h(q, d, i):
+    h = 0
+    flow = 0
+    while flow <= q:
+        if validate_filling(h, d):
+            flow = calc_flow(h, d, i)
+            h += 0.001
+            print(f"q: {q}, flow: {flow:.4f}, h: {h:.4f}")
+    return h
+
+
+print(find_h(0.3, 0.2, 0.1))
+
 
 
 
