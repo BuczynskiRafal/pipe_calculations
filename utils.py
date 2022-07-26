@@ -1,6 +1,7 @@
 import logging
 import math
 import numpy as np
+import pandas as pd
 
 
 logger = logging.getLogger(__name__)
@@ -134,12 +135,16 @@ def find_h(q, d, i):
     return h
 
 
-print(find_h(0.3, 0.2, 0.1))
+# print(find_h(0.3, 0.2, 0.1))
 
 
+def insert_excel_data(path):
+    data = pd.read_excel(path)
+    df = pd.DataFrame(data)
+    df.rename(columns=df.iloc[0]).drop(df.index[0])
+    return df
 
-
-
+print(insert_excel_data('pipes.xlsx'))
 
 
 
