@@ -160,10 +160,33 @@ def calc_flow(h: float, d: float, i: float) -> float:
         return f * 1000 * v
 
 
-def min_slope(h, d):
-    """Rh(h) — promień hydrauliczny w [mm]."""
-    rh = calc_rh(h, d)
-    return 0.25 / rh
+def min_slope(h, d, section='circular', f=None, rh=None):
+    """
+    The minimum slope of a circular pipe is 1/d,
+    and the minimum slope of a non-circular pipe is 0.25/rh
+
+    Args:
+        h (int, float): pipe filling height in circular section [m]
+        d (int, float): pipe diameter [m]
+        section (str): the shape of the cross-section of the channel, defaults to circular (optional)
+        f (int, float):
+        rh
+
+    :param section: the shape of the cross-section of the channel, defaults to circular (optional)
+    :param f: the hydraulic radius of the channel
+    :param rh: hydraulic radius
+    :return: The minimum slope of the channel.
+
+    Return:
+        i (int, float): The minimum slope of the channel [‰]
+    """
+    if section == 'circular':
+        if h / d >= 0.3:
+            return 1 / d
+    elif section in ['circular worn out', 'egg', 'pear', 'bell']:
+        return 0.25 / rh
+    elif section in ['rectangular', 'trapezoidal', 'pentagonal', 'complex']:
+        return 0.25 / f * rh
 
 
 def max_slope(d):
