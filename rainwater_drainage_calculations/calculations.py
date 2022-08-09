@@ -1,6 +1,7 @@
 import math
 import logging
 import matplotlib.pyplot as plt
+import pandas as pd
 from numpy import sin, cos, pi, linspace
 
 logger = logging.getLogger(__name__)
@@ -160,57 +161,76 @@ def calc_flow(h: float, d: float, i: float) -> float:
         return f * 1000 * v
 
 
-def min_slope(h, d, section='circular', f=None, rh=None):
+def min_slope(h, d):
     """
-    The minimum slope of a circular pipe is 1/d,
-    and the minimum slope of a non-circular pipe is 0.25/rh
+    If the pipe  filling is greater than 0.3, then the minimum slope is 1/d, otherwise it's 0.25/rh
 
     Args:
         h (int, float): pipe filling height in circular section [m]
         d (int, float): pipe diameter [m]
-        section (str): the shape of the cross-section of the channel, defaults to circular (optional)
-        f (int, float):
-        rh
-
-    :param section: the shape of the cross-section of the channel, defaults to circular (optional)
-    :param f: the hydraulic radius of the channel
-    :param rh: hydraulic radius
-    :return: The minimum slope of the channel.
 
     Return:
         i (int, float): The minimum slope of the channel [‰]
     """
-    if section == 'circular':
-        if h / d >= 0.3:
-            return 1 / d
-    elif section in ['circular worn out', 'egg', 'pear', 'bell']:
-        return 0.25 / rh
-    elif section in ['rectangular', 'trapezoidal', 'pentagonal', 'complex']:
-        return 0.25 / f * rh
+    if h / d >= 0.3:
+        return 1 / d
+    else:
+        return 0.25 / calc_rh(h, d)
+
+# not only for circular section
+# def min_slope(h, d, section='circular', f=None, rh=None):
+#     """
+#     The minimum slope of a circular pipe is 1/d if ,
+#     and the minimum slope of a non-circular pipe is 0.25/rh
+#
+#     Args:
+#         h (int, float): pipe filling height in circular section [m]
+#         d (int, float): pipe diameter [m]
+#         section (str): the shape of the cross-section of the channel, defaults to circular (optional)
+#         f (int, float): shape factor. Default None, is needed to calculate 'rectangular', 'trapezoidal', 'pentagonal', 'complex' section pipes.
+#         rh (int, float): hydraulic radius [m]. If section is circular use calc_rh to calculate input rh.
+#
+#     Return:
+#         i (int, float): The minimum slope of the channel [‰]
+#     """
+#     if h / d >= 0.3:
+#         if section == 'circular':
+#             return 1 / d
+#     elif section in ['circular', 'circular worn out', 'egg', 'pear', 'bell']:
+#         return 0.25 / rh
+#     elif section in ['rectangular', 'trapezoidal', 'pentagonal', 'complex']:
+#         return 0.25 / f * rh
 
 
-def max_slope(d):
-    # velocity = 5 m/s
-    if d == 0.2:
-        return 230
-    elif d == 0.25:
-        return 167.5
-    elif d == 0.3:
-        return 132.5
-    elif d == 0.4:
-        return 90
-    elif d == 0.5:
-        return 67.5
-    elif d == 0.6:
-        return 52.5
-    elif d == 0.8:
-        return 37.5
-    elif d == 1:
-        return 27.5
-    elif d == 1.5:
-        return 15.6
-    elif d == 2:
-        return 10.6
+def max_slope(d, v=5):
+    """
+    Maximum slopes of the channel bottom calculated according to the Manning formula.
+    The maximum slopes (imax) of the channel bottom were determined (according to WTP)
+    in a similar way, i.e. with complete filling, the sewage flow velocity should not exceed the value of
+
+        Vmax = 3.0 m / s -  in household and industrial sewers for concrete and ceramic pipes,
+        Vmax = 5.0 m / s -  in household and industrial sewers for reinforced concrete and cast iron pipes,
+        Vmax = 7.0 m / s -  in rainwater and combined sewers, regardless of the sewer material, as such sewers,
+                            with a significant filling, operate periodically, compared to household and industrial
+                            sewers.
+
+    Args:
+        d (int, float): pipe diameter [m]
+        v (int):        max sewage flow velocity in the sewer [m/s]
+
+    Return:
+        i (int, float): The maximum slope of the channel [‰]
+    """
+    slopes = {
+        'DN': [0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2],
+        3: [82.8, 60.3, 47.7, 32.4, 24.3, 18.9, 13.5, 9.9, 5.6, 3.8],
+        5: [230, 167.5, 132.5, 90, 67.5, 52.5, 37.5, 27.5, 15.6, 10.6],
+        7: [450.8, 328.3, 259.7, 176.4, 132.3, 102.9, 73.5, 53.9, 30.6, 20.9],
+    }
+    df = pd.DataFrame(data=slopes)
+    val = df.loc[df['DN'] == d][v]
+    return float(val)
+print(max_slope(0.2, 5))
 
 
 def max_h(d):
