@@ -15,20 +15,21 @@ from epanettools.epanettools import (
 from epanettools.examples import simple
 
 file = os.path.join(os.path.dirname(simple.__file__), "Net3.inp")
-# print(f"file path {file}")
-es = EPANetSimulation(file)
+print(f"file path {file}")
+sim = EPANetSimulation(file)
 # print(dir(es))
 
 
-nodes = es.network.nodes
+
+nodes = sim.network.nodes
 # print(len(nodes))
-nodes_list = list(es.network.nodes)[:5]
+nodes_list = list(sim.network.nodes)[:5]
 # print(nodes_list)
-id_5 = [es.network.nodes[x].id for x in nodes_list]
+id_5 = [sim.network.nodes[x].id for x in nodes_list]
 # print(id_5)
 # print([nodes[node].id for node in nodes_list])
 #
-m = es.network.links
+m = sim.network.links
 print(len(m))
 id_pipe_1 = m[1].id
 print(id_pipe_1)
