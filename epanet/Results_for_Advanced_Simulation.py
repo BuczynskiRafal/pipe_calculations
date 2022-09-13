@@ -34,7 +34,7 @@ pressure = Node.value_type["EN_PRESSURE"]
 
 # Jakie są węzły z podciśnieniem?
 negative_pressure_nodes = [
-    dir(node) for _, node in nodes.items() if min(node.results[pressure]) < 0
+    node.id for _, node in nodes.items() if min(node.results[pressure]) < 0
 ]
 # nodes_neg = sorted([y.id for x, y in nodes.items() if min(y.results[pressure]) < 0])
 print(negative_pressure_nodes)
