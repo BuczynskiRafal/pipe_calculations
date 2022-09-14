@@ -15,25 +15,28 @@ event, values = sg.Window(
     ],
 ).Read()
 
-# leer la red
+# read the network
 file = values[0]
-es = EPANetSimulation(file)
+sim = EPANetSimulation(file)
 
-# instanciar nodos y conductos
-cond = es.network.links
-nod = es.network.nodes
+# creating nodes and pipes
+links = sim.network.links
+nodes = sim.network.nodes
 
-# obtener la cantidad de tubos
-ret, num_links = es.ENgetcount(es.EN_LINKCOUNT)  # numero de links
-ret, num_nodes = es.ENgetcount(es.EN_NODECOUNT)  # numero de nodos
+# get the count of pipes
+_, num_links = sim.ENgetcount(sim.EN_LINKCOUNT)  # count of links
+# print(ret, num_links)
+ret, num_nodes = sim.ENgetcount(sim.EN_NODECOUNT)  # count of nodes
+# print(ret, num_nodes)
+
 
 # instanciar los objetos link y nodos del modelo
-diametros = Link.value_type["EN_DIAMETER"]
-presiones = Node.value_type["EN_PRESSURE"]
+diameter = Link.value_type["EN_DIAMETER"]
+pressure = Node.value_type["EN_PRESSURE"]
 flow = Link.value_type["EN_FLOW"]
 
-es.run()  # correr el modelo
-NODOS = ""
+sim.run()  # correr el modelo
+NODES = ""
 P = []
 ID = []
 P_neg = []
@@ -41,15 +44,15 @@ ID_neg = []
 # para mostrar las presiones
 for i in range(num_nodes - 1):
 
-    if nod[i + 1].results[presiones][0] < 0:
-        NODOS = NODOS + " " + nod[i].id
-        P_neg.append(nod[i + 1].results[presiones][0])
-        ID_neg.append(nod[i + 1].id)
+    if nodes[i + 1].results[pressure][0] < 0:
+        NODES = NODES + " " + nodes[i].id
+        P_neg.append(nodes[i + 1].results[pressure][0])
+        ID_neg.append(nodes[i + 1].id)
     else:
-        P.append(nod[i + 1].results[presiones][0])
-        ID.append(nod[i + 1].id)
+        P.append(nodes[i + 1].results[pressure][0])
+        ID.append(nodes[i + 1].id)
 
-sg.Popup("Nodos negativos son: ", NODOS)
+sg.Popup("Nodos negativos son: ", NODES)
 
 # Configurar las características del gráfico
 plt.bar(ID, P, label="Presiones+(mca)", width=0.5, color="lightblue")
