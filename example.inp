@@ -54,16 +54,19 @@ DRY_ONLY         NO
 ;;Name           Rain Gage        Outlet           Area     %Imperv  Width    %Slope   CurbLen  SnowPack        
 ;;-------------- ---------------- ---------------- -------- -------- -------- -------- -------- ----------------
 S1               1                J1               5        25       500      0.5      0                        
+S2               1                J1               10       25       500      0.5      0                        
 
 [SUBAREAS]
 ;;Subcatchment   N-Imperv   N-Perv     S-Imperv   S-Perv     PctZero    RouteTo    PctRouted 
 ;;-------------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
 S1               0.01       0.1        0.05       0.05       25         OUTLET    
+S2               0.01       0.1        0.05       0.05       25         OUTLET    
 
 [INFILTRATION]
 ;;Subcatchment   Param1     Param2     Param3     Param4     Param5    
 ;;-------------- ---------- ---------- ---------- ---------- ----------
 S1               3.0        0.5        4          7          0         
+S2               3.0        0.5        4          7          0         
 
 [JUNCTIONS]
 ;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded   
@@ -117,7 +120,7 @@ C4               CIRCULAR     1                0          0          0          
 2-yr                        1:55       0.13      
 ;
 ;for calcutate runoff to publication
-test_series                 0:0        1         
+test_series                 0:30       100       
 
 [REPORT]
 ;;Reporting Options
@@ -145,11 +148,15 @@ O4               777203.103         592557.130
 [Polygons]
 ;;Subcatchment   X-Coord            Y-Coord           
 ;;-------------- ------------------ ------------------
-S1               777177.771         592586.915        
-S1               777187.170         592587.303        
-S1               777187.290         592577.993        
-S1               777178.010         592577.844        
-S1               777177.771         592587.034        
+S1               777175.934         592588.598        
+S1               777185.333         592588.986        
+S1               777185.453         592579.676        
+S1               777176.173         592579.527        
+S1               777175.934         592588.717        
+S2               777149.430         592596.539        
+S2               777222.009         592594.408        
+S2               777205.462         592653.323        
+S2               777149.681         592650.064        
 
 [SYMBOLS]
 ;;Gage           X-Coord            Y-Coord           
