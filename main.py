@@ -1,29 +1,69 @@
 import pandas as pd
 import numpy as np
-from pyswmm import Simulation, Subcatchments
+from pyswmm import Simulation, Subcatchments, Links
 
 
-def get_runoff(min_slope=0.05, max_slope=100, file_path='example.inp'):
-    slope = []
-    runoff = []
-    s = min_slope
-    while s < max_slope:
-        slope.append(s)
-        with Simulation(file_path) as sim:
-            s1 = Subcatchments(sim)["S2"]
-            s1.slope = s
+class PipeData:
+    def __init__(self):
+        self.flow_turn_sign = []
+        self.flow_turns = []
+        self.peak_depth = []
+        self.peak_flow = []
+        self.peak_flow_date = []
+        self.peak_velocity = []
+        self.time_capacity_limited = []
+        self.time_courant_crit = []
+        self.time_full_downstream = []
+        self.time_full_flow = []
+        self.time_full_upstream = []
+        self.time_normal_flow = []
 
-            max_runoff = 0
-            # Where your simulation runs
-            for step in sim:
-                if s1.runoff > max_runoff:
-                    max_runoff = s1.runoff
-            runoff.append(max_runoff)
-            # print("For Slope: {}, max runoff is {}".format(slope, max_runoff))
-        s += 0.05
-    return {"slope": slope, "runoff": runoff}
 
-data = get_runoff()
+class CatchmentData:
+    def __init__(self):
+        self.runoff = []
+        self.peak_runoff_rate = []
+        self.infiltration = []
+        self.evaporation = []
 
-df = pd.DataFrame(data=data, columns=["slope", "runoff"])
-print(df.head(10))
+
+class Analyse:
+    def __init__(self, file_path='example.inp'):
+        self.pipe_data = PipeData()
+        self.catchment_data = CatchmentData()
+        self.slope = []
+        self._file_path = file_path
+
+    def show_subcatchment(self):
+        with Simulation(self._file_path) as sim:
+            return [subcatchment.subcatchmentid for subcatchment in Subcatchments(sim)]
+
+    def show_conduits(self):
+        with Simulation(self._file_path) as sim:
+            return [conduit.linkid for conduit in Links(sim)]
+
+    def simulation(self, conduit_id=None, subcatchment_id=None, min_slope=0.1, max_slope=100, step=0.1):
+        counter = min_slope
+        while counter < max_slope:
+            self.slope.append(counter)
+            with Simulation(self._file_path) as sim:
+                conduit = Links(sim)[conduit_id]
+                catchment = Subcatchments(sim)[subcatchment_id]
+                for _ in sim:
+                    pass
+                conduit_stats = conduit.conduit_statistics
+                catchment_stats = catchment.statistics
+                for key in vars(self.pipe_data):
+                    getattr(self.pipe_data, key).append(conduit_stats[key])
+                for key in vars(self.catchment_data):
+                    getattr(self.catchment_data, key).append(catchment_stats[key])
+            counter += step
+        return None
+
+
+
+pipe = Analyse()
+# print(pipe.show_subcatchment())
+pipe.simulation("C3", "S1")
+print(pipe.get_data())
+
