@@ -49,6 +49,7 @@ class Analyse:
             with Simulation(self._file_path) as sim:
                 conduit = Links(sim)[conduit_id]
                 catchment = Subcatchments(sim)[subcatchment_id]
+                catchment.slope = counter
                 for _ in sim:
                     pass
                 conduit_stats = conduit.conduit_statistics
